@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="webChatApp">
+<head>
+    <title>Simple Web Chat</title>
+</head>
+<body ng-controller="ChatController">
+    <div>
+        <input type="text" ng-model="userName" placeholder="Enter your name">
+        <button ng-click="joinChat()">Join Chat</button>
+    </div>
+    <div ng-show="isChatActive">
+        <div>
+            <input type="text" ng-model="message" placeholder="Type your message">
+            <button ng-click="sendMessage()">Send</button>
+        </div>
+        <div>
+            <div ng-repeat="msg in chatHistory">
+                <strong>{{msg.sender}}:</strong> {{msg.text}}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
