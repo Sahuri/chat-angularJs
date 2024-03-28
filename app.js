@@ -1,39 +1,44 @@
 angular.module('webChatApp', [])
-    .controller('ChatController', function ($scope) {
+    .controller('ChatController', function ($scope, $window) {
         $scope.isChatActive = false;
+        $scope.userName = '';
+        $scope.message = '';
         $scope.chatHistory = [];
 
         $scope.joinChat = function () {
             if ($scope.userName) {
                 $scope.isChatActive = true;
+                $scope.loadChatHistory();
             }
         };
 
         $scope.sendMessage = function () {
-            if ($scope.message) {
-                var newMessage = {
-                    sender: $scope.userName,
-                    text: $scope.message
-                };
-                $scope.chatHistory.push(newMessage);
-                localStorage.setItem('chatHistory', JSON.stringify($scope.chatHistory));
-                $scope.message = '';
+            if ($scope.userName && $scope.message) {  
+                $scope.loadChatHistory();
+                $scope.chatHistory.push({ sender: $scope.userName, text: $scope.message });
+                $window.localStorage.setItem('chatHistory', JSON.stringify($scope.chatHistory));
             }
         };
 
+        // Mendengarkan pesan yang dikirim dari tab lainnya
+        $window.addEventListener('storage', function(event) {
+            if (event.key === 'chatHistory') {
+                $scope.$apply(function() {
+                    var newData=JSON.parse(event.newValue);
+                    $scope.chatHistory.push(newData[newData.length - 1]);
+                    console.log($scope.chatHistory);
+                });
+            }
+        });
+
         $scope.loadChatHistory = function () {
-            var history = localStorage.getItem('chatHistory');
+            var history = $window.localStorage.getItem('chatHistory');
             if (history) {
                 $scope.chatHistory = JSON.parse(history);
+                console.log($scope.chatHistory);
             }
         };
 
         $scope.loadChatHistory();
 
-        // Watch for changes in chatHistory to update local storage
-        $scope.$watch('chatHistory', function (newVal, oldVal) {
-            if (newVal !== oldVal) {
-                localStorage.setItem('chatHistory', JSON.stringify($scope.chatHistory));
-            }
-        }, true);
     });
